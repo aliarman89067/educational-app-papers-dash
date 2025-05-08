@@ -1,6 +1,8 @@
 // extensions/Circle.ts
+import { CircleNodeView } from "@/components/circleNodeView";
 import { getNodesPercentage } from "@/lib/utils";
 import { Node, mergeAttributes } from "@tiptap/core";
+import { ReactNodeViewRenderer } from "@tiptap/react";
 
 export interface CircleOptions {
   HTMLAttributes: Record<string, any>;
@@ -10,14 +12,15 @@ declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     circle: {
       insertCircle: (attrs: {
+        id: string;
         size?: number;
         color?: string;
         align: string;
+        style?: string;
       }) => ReturnType;
     };
   }
 }
-
 export const Circle = Node.create<CircleOptions>({
   name: "circle",
 
@@ -44,25 +47,11 @@ export const Circle = Node.create<CircleOptions>({
   },
 
   renderHTML({ HTMLAttributes }) {
-    const alignment = HTMLAttributes.align || "left";
-    const marginMap: any = {
-      left: "0 auto 0 0",
-      center: "0 auto",
-      right: "0 0 0 auto",
-    };
-
     return [
       "div",
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
         "data-type": "circle",
-        style: `
-          width: ${getNodesPercentage(50)}px;
-          height: ${getNodesPercentage(50)}px;
-          background-color: ${HTMLAttributes.color};
-          border-radius: 50%;
-          display: block;
-          margin-left: auto;
-        `,
+        style: HTMLAttributes.style,
       }),
       "",
     ];
@@ -70,11 +59,42 @@ export const Circle = Node.create<CircleOptions>({
 
   addAttributes() {
     return {
+      id: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-id"),
+        renderHTML: (attributes) => {
+          return {
+            "data-id": attributes.id,
+          };
+        },
+      },
+      name: {
+        default: "circle",
+      },
       size: {
         default: 100,
       },
       color: {
         default: "#3498db",
+      },
+      class: {
+        default: "",
+        parseHTML: (element) => element.getAttribute("class"),
+        renderHTML: (attrs) => {
+          return {
+            class: attrs.class || null,
+          };
+        },
+      },
+      style: {
+        default:
+          "background-color: red; width: 200px; height: 200px; border-radius: 50%",
+        parseHTML: (element) => element.getAttribute("style"),
+        renderHTML: (attrs) => {
+          return {
+            style: attrs.style || null,
+          };
+        },
       },
       align: {
         default: "right",
@@ -86,6 +106,10 @@ export const Circle = Node.create<CircleOptions>({
         },
       },
     };
+  },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(CircleNodeView);
   },
 
   addCommands() {

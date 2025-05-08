@@ -2,7 +2,7 @@
 
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { useEditorStore } from "@/store/zustand";
+import { useEditorStore, useTargetNode } from "@/store/zustand";
 import {
   AlignCenterIcon,
   AlignJustifyIcon,
@@ -50,6 +50,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { v4 as uuidv4 } from "uuid";
 
 const LineHeightButton = () => {
   const { editor } = useEditorStore();
@@ -234,6 +235,7 @@ const ListButton = () => {
 };
 const AlignButton = () => {
   const { editor } = useEditorStore();
+  const { nodeId } = useTargetNode();
 
   const alignments = [
     {
@@ -258,6 +260,40 @@ const AlignButton = () => {
     },
   ];
 
+  const handleUpdateNode = (value: string) => {
+    if (nodeId) {
+      const getMargin = () => {
+        if (value === "left") {
+          return `margin-right: auto`;
+        } else if (value === "right") {
+          return `margin-left: auto`;
+        } else if (value === "center") {
+          return `margin-inline: auto`;
+        }
+      };
+
+      editor?.state.doc.descendants((node, pos) => {
+        if (node.attrs.id && node.attrs.id === nodeId) {
+          console.log("Matched Node", node);
+          editor
+            .chain()
+            .focus()
+            .command(({ tr }) => {
+              tr.setNodeMarkup(pos, undefined, {
+                ...node.attrs,
+                align: value,
+                style: `background-color: black; width: 200px; height: 200px; border-radius: 50%; ${getMargin()}`,
+              });
+              return true;
+            })
+            .run();
+        }
+      });
+    } else {
+      editor?.chain().focus().setTextAlign(value).run();
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -268,8 +304,9 @@ const AlignButton = () => {
       <DropdownMenuContent className="p-1 flex flex-col gap-y-1">
         {alignments.map(({ label, value, Icon }) => (
           <button
+            disabled={nodeId && value === "justify" ? true : false}
             key={value}
-            onClick={() => editor?.chain().focus().setTextAlign(value).run()}
+            onClick={() => handleUpdateNode(value)}
             className={cn(
               "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-neutral-100/80",
               editor?.isActive({ textAlign: value }) && "bg-neutral-200/80"
@@ -572,12 +609,16 @@ const ToolbarButton = ({ onClick, isActive, Icon }: ToolbarButtonProps) => {
 
 export default function Toolbar() {
   const { editor } = useEditorStore();
+  const { nodeId, setNodeId } = useTargetNode();
+
+  const uuid = uuidv4();
 
   const sections: {
     label: string;
     Icon: LucideIcon;
     onClick: () => void;
     isActive?: boolean;
+    setId?: (id: string) => void;
   }[][] = [
     [
       {
@@ -642,41 +683,53 @@ export default function Toolbar() {
       {
         label: "Circle Shape",
         Icon: CircleIcon,
-        onClick: () =>
-          editor?.commands.insertCircle({
-            size: 150,
-            color: "red",
-            align: "center",
-          }),
+        onClick: () => {
+          editor
+            ?.chain()
+            .focus()
+            .insertCircle({
+              id: uuid,
+              size: 150,
+              color: "red",
+              align: "left",
+            })
+            .run();
+          // setNodeId(uuid);
+        },
       },
     ],
   ];
   return (
-    <div className="bg-[#f1f4f9] px-2.5 py-0.5 rounded-[24px] min-h-[40px] flex items-center gap-0.5 overflow-x-auto">
-      {sections[0].map((item) => (
-        <ToolbarButton key={item.label} {...item} />
-      ))}
-      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
-      <FontFamilyButton />
-      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
-      <HeadingLevelButton />
-      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
-      <FontSizeButton />
-      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
-      {sections[1].map((item) => (
-        <ToolbarButton key={item.label} {...item} />
-      ))}
-      <TextColorButton />
-      <HighlightColorButton />
-      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
-      <LinkButton />
-      <ImageButton />
-      <AlignButton />
-      <LineHeightButton />
-      <ListButton />
-      {sections[2].map((item) => (
-        <ToolbarButton key={item.label} {...item} />
-      ))}
+    <div className="flex items-center w-full justify-between bg-[#f1f4f9] px-2.5 py-0.5 rounded-[24px] min-h-[40px]">
+      <div className="flex items-center gap-0.5 overflow-x-auto">
+        {sections[0].map((item) => (
+          <ToolbarButton key={item.label} {...item} />
+        ))}
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <FontFamilyButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <HeadingLevelButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <FontSizeButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        {sections[1].map((item) => (
+          <ToolbarButton key={item.label} {...item} />
+        ))}
+        <TextColorButton />
+        <HighlightColorButton />
+        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <LinkButton />
+        <ImageButton />
+        <AlignButton />
+        <LineHeightButton />
+        <ListButton />
+        {sections[2].map((item) => (
+          <ToolbarButton key={item.label} {...item} />
+        ))}
+      </div>
+      {nodeId && (
+        <div className="flex items-center gap-0.5 overflow-x-auto"></div>
+      )}
     </div>
   );
 }
