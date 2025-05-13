@@ -19,7 +19,7 @@ export const CircleNodeView = ({ node, updateAttributes, selected }: any) => {
   return (
     <NodeViewWrapper className="block w-full" data-type="circle">
       <div
-        style={getAlign()}
+        style={getAlign() }
         className={`w-fit ${selected ? "outline-wrapper" : ""}`}
       >
         <ResizableBox

@@ -2,7 +2,7 @@
 
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { useEditorStore, useTargetNode } from "@/store/zustand";
+import { useEditorCount, useEditorStore, useTargetNode } from "@/store/zustand";
 import {
   AlignCenterIcon,
   AlignJustifyIcon,
@@ -28,6 +28,8 @@ import {
   RemoveFormattingIcon,
   SearchIcon,
   SpellCheck,
+  Subscript,
+  Superscript,
   UnderlineIcon,
   Undo2,
   UploadIcon,
@@ -609,9 +611,7 @@ const ToolbarButton = ({ onClick, isActive, Icon }: ToolbarButtonProps) => {
 
 export default function Toolbar() {
   const { editor } = useEditorStore();
-  const { nodeId, setNodeId } = useTargetNode();
-
-  const uuid = uuidv4();
+  const {increaseCount} = useEditorCount()
 
   const sections: {
     label: string;
@@ -680,44 +680,72 @@ export default function Toolbar() {
         Icon: RemoveFormattingIcon,
         onClick: () => editor?.chain().focus().unsetAllMarks().run(),
       },
+    ],
+    [
       {
-        label: "Circle Shape",
-        Icon: CircleIcon,
+        label: "Sub Script",
+        Icon: Subscript,
         onClick: () => {
-          editor
-            ?.chain()
-            .focus()
-            .insertCircle({
-              id: uuid,
-              size: 150,
-              color: "red",
-              align: "left",
-            })
-            .run();
-          // setNodeId(uuid);
+          if (editor?.isActive("superscript")) {
+            console.log("Unactive Sup Script and run Sub Script");
+            editor?.commands.unsetSuperscript();
+            editor?.commands.setSubscript();
+          } else if (editor?.isActive("subscript")) {
+            editor?.commands.unsetSubscript();
+          } else {
+            editor?.commands.setSubscript();
+          }
         },
+        isActive: editor?.isActive("subscript"),
+      },
+      {
+        label: "Sup Script",
+        Icon: Superscript,
+        onClick: () => {
+          if (editor?.isActive("subscript")) {
+            console.log("Unactive Sub Script and run Sup Script");
+            editor?.commands.unsetSubscript();
+            editor?.commands.setSuperscript();
+          } else if (editor?.isActive("superscript")) {
+            editor?.commands.unsetSuperscript();
+          } else {
+            editor?.commands.setSuperscript();
+          }
+        },
+        isActive: editor?.isActive("superscript"),
       },
     ],
   ];
+
+
+  const handleIncreaseEditor = () => {
+    increaseCount()
+  }
+
   return (
     <div className="flex items-center w-full justify-between bg-[#f1f4f9] px-2.5 py-0.5 rounded-[24px] min-h-[40px]">
       <div className="flex items-center gap-0.5 overflow-x-auto">
         {sections[0].map((item) => (
           <ToolbarButton key={item.label} {...item} />
         ))}
-        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <div className="w-[1px] h-6 bg-gray-600" />
         <FontFamilyButton />
-        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <div className="w-[1px] h-6 bg-gray-600" />
         <HeadingLevelButton />
-        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <div className="w-[1px] h-6 bg-gray-600" />
         <FontSizeButton />
-        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <div className="w-[1px] h-6 bg-gray-600" />
         {sections[1].map((item) => (
           <ToolbarButton key={item.label} {...item} />
         ))}
+        <div className="w-[1px] h-6 bg-gray-600" />
+        {sections[3].map((item) => (
+          <ToolbarButton key={item.label} {...item} />
+        ))}
+        <div className="w-[1px] h-6 bg-gray-600" />
         <TextColorButton />
         <HighlightColorButton />
-        <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+        <div className="w-[1px] h-6 bg-gray-600" />
         <LinkButton />
         <ImageButton />
         <AlignButton />
@@ -726,10 +754,8 @@ export default function Toolbar() {
         {sections[2].map((item) => (
           <ToolbarButton key={item.label} {...item} />
         ))}
+        <Button variant="outline" onClick={handleIncreaseEditor}>Add Question +</Button>
       </div>
-      {nodeId && (
-        <div className="flex items-center gap-0.5 overflow-x-auto"></div>
-      )}
     </div>
   );
 }

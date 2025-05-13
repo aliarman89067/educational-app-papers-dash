@@ -1,6 +1,6 @@
 "use client";
 
-import { useEditorStore, useTargetNode } from "@/store/zustand";
+import { useEditorCount, useEditorStore, useTargetNode } from "@/store/zustand";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TaskItem from "@tiptap/extension-task-item";
@@ -19,50 +19,23 @@ import HighLight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
 import History from "@tiptap/extension-history";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
 import { FontSizeExtension } from "@/extensions/font-size";
 import { LineHeightExtension } from "@/extensions/line-height";
 import { Circle } from "@/extensions/node-wrapper";
-import { useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
+import { Minus } from "lucide-react";
 
-const Tiptap = () => {
+interface Props {
+  id: number;
+}
+
+const Tiptap = ({ id }: Props) => {
   const { setEditor, editor: editorContent } = useEditorStore();
-  const { setNodeId, nodeId } = useTargetNode();
+  const { updateHtml, decreaseCount } = useEditorCount();
 
-  console.log(editorContent?.getHTML());
-
-  useEffect(() => {
-    if (nodeId) {
-      editorContent?.state.doc.descendants((node, pos) => {
-        if (node.attrs.id && node.attrs.id === nodeId) {
-          editorContent
-            .chain()
-            .focus()
-            .command(({ tr }) => {
-              tr.setNodeMarkup(pos, undefined, {
-                ...node.attrs,
-                class: `outline-wrapper`,
-              });
-              return true;
-            })
-            .run();
-        } else {
-          editorContent
-            .chain()
-            .focus()
-            .command(({ tr }) => {
-              tr.setNodeMarkup(pos, undefined, {
-                ...node.attrs,
-                class: ``,
-              });
-              return true;
-            })
-            .run();
-        }
-      });
-    }
-  }, [nodeId]);
-
-  const editor = useEditor({
+  const editorContainer = useEditor({
     immediatelyRender: false,
     onCreate({ editor }) {
       setEditor(editor);
@@ -72,6 +45,20 @@ const Tiptap = () => {
     },
     onUpdate({ editor }) {
       setEditor(editor);
+      updateHtml(id, editor.getHTML());
+      // setGetHtml((prev) => {
+      //   if (!prev || !prev[id]) {
+      //     return [...(prev || []), { id, html: editor.getHTML() }];
+      //   }
+
+      //   return prev.map((item) => {
+      //     if (item.id === id) {
+      //       return { id: item.id, html: editor.getHTML() };
+      //     } else {
+      //       return item;
+      //     }
+      //   });
+      // });
     },
     onSelectionUpdate({ editor }) {
       setEditor(editor);
@@ -126,46 +113,37 @@ const Tiptap = () => {
       Image,
       ImageResize,
       Underline,
+      Subscript.configure({
+        HTMLAttributes: {
+          class: "my-custom-class",
+        },
+      }),
+      Superscript.configure({
+        HTMLAttributes: {
+          class: "my-custom-class",
+        },
+      }),
     ],
     editorProps: {
-      handleClickOn(_view, _pos, node, _nodePos, _event, _direct) {
-        if (node.attrs.id) {
-          setNodeId(node.attrs.id);
-        } else {
-          setNodeId(null);
-        }
-      },
-      handleClick(view, pos, event) {
-        const ev = event.target as HTMLElement;
-        if (ev.id === "white-board") {
-          setNodeId(null);
-
-          editorContent?.state.doc.descendants((node, pos) => {
-            editorContent
-              ?.chain()
-              .focus()
-              .command(({ tr }) => {
-                tr.setNodeMarkup(pos, undefined, {
-                  ...node.attrs,
-                  class: ``,
-                });
-                return true;
-              })
-              .run();
-          });
-        }
-      },
       attributes: {
         id: "white-board",
         class:
-          "focus:outline-none print:border-0 bg-white border border-[#c7c7c7] flex flex-col min-h-[1054px] w-[800px] px-2 py-1 cursor-text",
+          "focus:outline-none print:border-0 bg-white border border-[#c7c7c7] flex flex-col h-auto w-[800px] px-2 py-1 cursor-text rounded-sm",
       },
     },
   });
+  const handleRmoveEditor = () => {
+    decreaseCount(id);
+  };
   return (
-    <div className="min-w-max flex justify-center w-[800px] py-4 print:py-0 mx-auto print:w-full print:min-w-0">
-      <EditorContent editor={editor} draggable />
-      {/* <div className="w-[200px] h-[200px] rounded-full bg-red-500"></div> */}
+    <div className="flex items-center gap-2 w-fit mx-auto">
+      <div className="min-w-max flex justify-center w-[800px] py-4 print:py-0 mx-auto print:w-full print:min-w-0">
+        <EditorContent editor={editorContainer} draggable />
+      </div>
+      <Minus
+        onClick={handleRmoveEditor}
+        className="text-red-400 cursor-pointer"
+      />
     </div>
   );
 };
