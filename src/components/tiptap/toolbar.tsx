@@ -20,6 +20,7 @@ import {
   ListOrderedIcon,
   ListTodoIcon,
   LucideIcon,
+  MessageCircleQuestionIcon,
   MessageSquarePlus,
   MinusIcon,
   PlusIcon,
@@ -30,6 +31,7 @@ import {
   SpellCheck,
   Subscript,
   Superscript,
+  TextIcon,
   UnderlineIcon,
   Undo2,
   UploadIcon,
@@ -611,7 +613,10 @@ const ToolbarButton = ({ onClick, isActive, Icon }: ToolbarButtonProps) => {
 
 export default function Toolbar() {
   const { editor } = useEditorStore();
-  const {increaseCount} = useEditorCount()
+  const { increaseCount } = useEditorCount();
+  const { setNodeId } = useTargetNode();
+
+  const uuid = uuidv4();
 
   const sections: {
     label: string;
@@ -714,13 +719,30 @@ export default function Toolbar() {
         },
         isActive: editor?.isActive("superscript"),
       },
+      {
+        label: "Input",
+        Icon: MessageCircleQuestionIcon,
+        onClick: () => {
+          editor
+            ?.chain()
+            .focus()
+            .insertInput({
+              id: uuid,
+              align: "left",
+              height: 40,
+              width: 100,
+
+            })
+            .run();
+          setNodeId(uuid);
+        },
+      },
     ],
   ];
 
-
   const handleIncreaseEditor = () => {
-    increaseCount()
-  }
+    increaseCount();
+  };
 
   return (
     <div className="flex items-center w-full justify-between bg-[#f1f4f9] px-2.5 py-0.5 rounded-[24px] min-h-[40px]">
@@ -754,7 +776,9 @@ export default function Toolbar() {
         {sections[2].map((item) => (
           <ToolbarButton key={item.label} {...item} />
         ))}
-        <Button variant="outline" onClick={handleIncreaseEditor}>Add Question +</Button>
+        <Button variant="outline" onClick={handleIncreaseEditor}>
+          Add Question +
+        </Button>
       </div>
     </div>
   );

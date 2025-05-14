@@ -306,11 +306,6 @@
   right: 12px;
 }
 
-[data-type="circle"] {
-  margin: 10px;
-  cursor: move;
-}
-
 .text-updater-node {
   height: 50px;
   border: 1px solid #eee;
@@ -325,7 +320,7 @@
   font-size: 12px;
 }
 .outline-wrapper {
-  outline: 3px solid #00aaff;
+  outline: 2px solid #00aaff;
   outline-offset: 6px;
 }
 
@@ -393,4 +388,11 @@
 .react-resizable-handle-s {
   bottom: 0;
   transform: rotate(45deg);
+}
+
+.single-input {
+  border-bottom: 1px dashed #000;
+  border-top: transparent;
+  border-left: transparent;
+  border-right: transparent;
 }

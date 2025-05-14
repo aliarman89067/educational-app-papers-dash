@@ -24,7 +24,7 @@ import Superscript from "@tiptap/extension-superscript";
 import { FontSizeExtension } from "@/extensions/font-size";
 import { LineHeightExtension } from "@/extensions/line-height";
 import { Circle } from "@/extensions/node-wrapper";
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { SingleInput } from "@/extensions/input-single";
 import { Minus } from "lucide-react";
 
 interface Props {
@@ -68,6 +68,7 @@ const Tiptap = ({ id }: Props) => {
     },
     onFocus({ editor }) {
       setEditor(editor);
+      console.log(editor.getHTML());
     },
     onBlur({ editor }) {
       setEditor(editor);
@@ -113,6 +114,7 @@ const Tiptap = ({ id }: Props) => {
       Image,
       ImageResize,
       Underline,
+      SingleInput,
       Subscript.configure({
         HTMLAttributes: {
           class: "my-custom-class",
@@ -128,7 +130,7 @@ const Tiptap = ({ id }: Props) => {
       attributes: {
         id: "white-board",
         class:
-          "focus:outline-none print:border-0 bg-white border border-[#c7c7c7] flex flex-col h-auto w-[800px] px-2 py-1 cursor-text rounded-sm",
+          "focus:outline-none print:border-0 bg-white border border-[#c7c7c7] flex flex-col h-auto w-[800px] pr-2 pl-7 py-1 cursor-text rounded-sm",
       },
     },
   });
@@ -137,7 +139,10 @@ const Tiptap = ({ id }: Props) => {
   };
   return (
     <div className="flex items-center gap-2 w-fit mx-auto">
-      <div className="min-w-max flex justify-center w-[800px] py-4 print:py-0 mx-auto print:w-full print:min-w-0">
+      <div className="relative min-w-max flex justify-center w-[800px] py-4 print:py-0 mx-auto print:w-full print:min-w-0">
+        <div className="absolute top-5 left-2 z-10">
+          <span>{id}</span>
+        </div>
         <EditorContent editor={editorContainer} draggable />
       </div>
       <Minus

@@ -1,13 +1,15 @@
 "use client";
 import Tiptap from "@/components/tiptap/tiptap";
 import Toolbar from "@/components/tiptap/toolbar";
-import { useEditorCount } from "@/store/zustand";
+import { useEditorCount, useEditorStore, useTargetNode } from "@/store/zustand";
 import { useState } from "react";
 
 const HomePage = () => {
   const { editorArr } = useEditorCount();
+  const { editor } = useEditorStore();
 
-  console.log(editorArr);
+  const { nodeId } = useTargetNode();
+
   return (
     <div className="flex flex-col w-full h-full mx-auto">
       <Toolbar />
