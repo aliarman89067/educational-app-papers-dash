@@ -1,8 +1,20 @@
 import { cn } from "@/lib/utils";
-import { useTargetNode } from "@/store/zustand";
-import { NodeViewWrapper } from "@tiptap/react";
+import { useEditorStore, useTargetNode } from "@/store/zustand";
+import { NodeViewWrapper, useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { CSSProperties } from "react";
+import Underline from "@tiptap/extension-underline";
+import FontFamily from "@tiptap/extension-font-family";
+import TextStyle from "@tiptap/extension-text-style";
+import { Color } from "@tiptap/extension-color";
+import HighLight from "@tiptap/extension-highlight";
+import Link from "@tiptap/extension-link";
+import TextAlign from "@tiptap/extension-text-align";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import { FontSizeExtension } from "@/extensions/font-size";
+import { LineHeightExtension } from "@/extensions/line-height";
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
 
@@ -12,6 +24,7 @@ export const SingleInputNodeView = ({
   selected,
 }: any) => {
   const { setNodeId } = useTargetNode();
+  const { setEditor } = useEditorStore();
 
   const getAlign = (): CSSProperties => {
     if (node.attrs.align === "center") {
@@ -40,6 +53,159 @@ export const SingleInputNodeView = ({
   const handleChangeRightOption = () => {
     updateAttributes({ optionRight: !node.attrs.optionRight });
   };
+
+  const innerEditor1 = useEditor({
+    immediatelyRender: false,
+    onCreate({ editor }) {
+      setEditor(editor);
+    },
+    onDestroy() {
+      setEditor(null);
+    },
+    onUpdate({ editor }) {
+      setEditor(editor);
+      updateAttributes({ optionLeftHtml: editor.getHTML() });
+      // updateHtml(id, editor.getHTML());
+      // setGetHtml((prev) => {
+      //   if (!prev || !prev[id]) {
+      //     return [...(prev || []), { id, html: editor.getHTML() }];
+      //   }
+
+      //   return prev.map((item) => {
+      //     if (item.id === id) {
+      //       return { id: item.id, html: editor.getHTML() };
+      //     } else {
+      //       return item;
+      //     }
+      //   });
+      // });
+    },
+    onSelectionUpdate({ editor }) {
+      setEditor(editor);
+    },
+    onTransaction({ editor }) {
+      setEditor(editor);
+    },
+    onFocus({ editor }) {
+      setEditor(editor);
+    },
+    onBlur({ editor }) {
+      setEditor(editor);
+    },
+    onContentError({ editor }) {
+      setEditor(editor);
+    },
+    extensions: [
+      StarterKit,
+      Underline,
+      FontFamily,
+      TextStyle,
+      Color,
+      HighLight,
+      Link,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      Subscript.configure({
+        HTMLAttributes: {
+          class: "my-custom-class",
+        },
+      }),
+      Superscript.configure({
+        HTMLAttributes: {
+          class: "my-custom-class",
+        },
+      }),
+      FontSizeExtension,
+      LineHeightExtension.configure({
+        types: ["paragraph", "heading"],
+        defaultLineHeight: "normal",
+      }),
+    ],
+    content: "",
+    editable: true,
+    editorProps: {
+      attributes: {
+        class: "text-sm border rounded px-2 py-1 w-[80px] h-[30px]",
+      },
+    },
+  });
+  const innerEditor2 = useEditor({
+    immediatelyRender: false,
+    onCreate({ editor }) {
+      setEditor(editor);
+    },
+    onDestroy() {
+      setEditor(null);
+    },
+    onUpdate({ editor }) {
+      setEditor(editor);
+      updateAttributes({ optionRightHtml: editor.getHTML() });
+      // updateHtml(id, editor.getHTML());
+      // setGetHtml((prev) => {
+      //   if (!prev || !prev[id]) {
+      //     return [...(prev || []), { id, html: editor.getHTML() }];
+      //   }
+
+      //   return prev.map((item) => {
+      //     if (item.id === id) {
+      //       return { id: item.id, html: editor.getHTML() };
+      //     } else {
+      //       return item;
+      //     }
+      //   });
+      // });
+    },
+    onSelectionUpdate({ editor }) {
+      setEditor(editor);
+    },
+    onTransaction({ editor }) {
+      setEditor(editor);
+    },
+    onFocus({ editor }) {
+      setEditor(editor);
+    },
+    onBlur({ editor }) {
+      setEditor(editor);
+    },
+    onContentError({ editor }) {
+      setEditor(editor);
+    },
+    extensions: [
+      StarterKit,
+      Underline,
+      FontFamily,
+      TextStyle,
+      Color,
+      HighLight,
+      Link,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      Subscript.configure({
+        HTMLAttributes: {
+          class: "my-custom-class",
+        },
+      }),
+      Superscript.configure({
+        HTMLAttributes: {
+          class: "my-custom-class",
+        },
+      }),
+      FontSizeExtension,
+      LineHeightExtension.configure({
+        types: ["paragraph", "heading"],
+        defaultLineHeight: "normal",
+      }),
+    ],
+    content: "",
+    editable: true,
+    editorProps: {
+      attributes: {
+        class: "text-sm border rounded px-2 py-1 w-[80px] h-[30px]",
+      },
+    },
+  });
 
   return (
     <NodeViewWrapper className="block w-full" data-type="input">
@@ -83,16 +249,23 @@ export const SingleInputNodeView = ({
           </div>
         )}
         {selected && node.attrs.optionLeft ? (
-          <textarea
-            value={node.attrs.optionLeftText || ""}
-            onChange={handleOptionLeftChange}
-            className="text-sm border rounded px-2 py-1 w-[80px] h-[30px] resize-none"
-            onClick={(e) => e.stopPropagation()}
-          />
+          // <textarea
+          //   value={node.attrs.optionLeftText || ""}
+          //   onChange={handleOptionLeftChange}
+          //   className="text-sm border rounded px-2 py-1 w-[80px] h-[30px] resize-none"
+          //   onClick={(e) => e.stopPropagation()}
+          // />
+          <EditorContent editor={innerEditor1} />
         ) : (
           <>
             {node.attrs.optionLeft && (
-              <span className="text-sm">{node.attrs.optionLeftText}</span>
+              // <span className="text-sm">{}</span>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: innerEditor1?.getHTML() ?? "",
+                }}
+                className="text-sm"
+              />
             )}
           </>
         )}
@@ -111,16 +284,23 @@ export const SingleInputNodeView = ({
         />
 
         {selected && node.attrs.optionRight ? (
-          <textarea
-            value={node.attrs.optionRightText || ""}
-            onChange={handleOptionRightChange}
-            className="text-sm border rounded px-2 py-1 w-[80px] h-[30px] resize-none"
-            onClick={(e) => e.stopPropagation()}
-          />
+          // <textarea
+          //   value={node.attrs.optionRightText || ""}
+          //   onChange={handleOptionRightChange}
+          //   className="text-sm border rounded px-2 py-1 w-[80px] h-[30px] resize-none"
+          //   onClick={(e) => e.stopPropagation()}
+          // />
+          <EditorContent editor={innerEditor2} />
         ) : (
           <>
             {node.attrs.optionRight && (
-              <span className="text-sm">{node.attrs.optionRightText}</span>
+              // <span className="text-sm">{node.attrs.optionRightText}</span>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: innerEditor2?.getHTML() ?? "",
+                }}
+                className="text-sm"
+              />
             )}
           </>
         )}

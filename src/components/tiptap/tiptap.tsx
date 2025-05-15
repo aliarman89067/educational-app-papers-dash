@@ -1,6 +1,10 @@
 "use client";
 
-import { useEditorCount, useEditorStore, useTargetNode } from "@/store/zustand";
+import {
+  useEditorUpdateStore,
+  useEditorStore,
+  useTargetNode,
+} from "@/store/zustand";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TaskItem from "@tiptap/extension-task-item";
@@ -23,8 +27,8 @@ import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
 import { FontSizeExtension } from "@/extensions/font-size";
 import { LineHeightExtension } from "@/extensions/line-height";
-import { Circle } from "@/extensions/node-wrapper";
 import { SingleInput } from "@/extensions/input-single";
+import { Math } from "@/extensions/math.sign";
 import { Minus } from "lucide-react";
 
 interface Props {
@@ -33,7 +37,7 @@ interface Props {
 
 const Tiptap = ({ id }: Props) => {
   const { setEditor, editor: editorContent } = useEditorStore();
-  const { updateHtml, decreaseCount } = useEditorCount();
+  const { updateContent, decreaseCount } = useEditorUpdateStore();
 
   const editorContainer = useEditor({
     immediatelyRender: false,
@@ -45,7 +49,9 @@ const Tiptap = ({ id }: Props) => {
     },
     onUpdate({ editor }) {
       setEditor(editor);
-      updateHtml(id, editor.getHTML());
+      if (editor.getJSON().content) {
+        updateContent(id, editor.getJSON().content!!);
+      }
       // setGetHtml((prev) => {
       //   if (!prev || !prev[id]) {
       //     return [...(prev || []), { id, html: editor.getHTML() }];
@@ -68,7 +74,6 @@ const Tiptap = ({ id }: Props) => {
     },
     onFocus({ editor }) {
       setEditor(editor);
-      console.log(editor.getHTML());
     },
     onBlur({ editor }) {
       setEditor(editor);
@@ -77,7 +82,6 @@ const Tiptap = ({ id }: Props) => {
       setEditor(editor);
     },
     extensions: [
-      Circle,
       FontSizeExtension,
       LineHeightExtension.configure({
         types: ["paragraph", "heading"],
@@ -115,6 +119,7 @@ const Tiptap = ({ id }: Props) => {
       ImageResize,
       Underline,
       SingleInput,
+      Math,
       Subscript.configure({
         HTMLAttributes: {
           class: "my-custom-class",
@@ -126,6 +131,9 @@ const Tiptap = ({ id }: Props) => {
         },
       }),
     ],
+    content: `
+    <p>\\sqrt{x}</p>
+    `,
     editorProps: {
       attributes: {
         id: "white-board",

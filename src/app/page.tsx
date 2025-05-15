@@ -1,20 +1,24 @@
 "use client";
 import Tiptap from "@/components/tiptap/tiptap";
 import Toolbar from "@/components/tiptap/toolbar";
-import { useEditorCount, useEditorStore, useTargetNode } from "@/store/zustand";
+import {
+  useEditorStore,
+  useEditorUpdateStore,
+  useTargetNode,
+} from "@/store/zustand";
 import { useState } from "react";
 
 const HomePage = () => {
-  const { editorArr } = useEditorCount();
+  const { editorContentArr } = useEditorUpdateStore();
   const { editor } = useEditorStore();
 
   const { nodeId } = useTargetNode();
-
+  console.log(editorContentArr);
   return (
     <div className="flex flex-col w-full h-full mx-auto">
       <Toolbar />
-      {editorArr.map((item) => (
-        <Tiptap key={item.id} id={item.id} />
+      {editorContentArr.map((item, index) => (
+        <Tiptap key={index} id={item.id} />
       ))}
     </div>
   );

@@ -2,7 +2,11 @@
 
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { useEditorCount, useEditorStore, useTargetNode } from "@/store/zustand";
+import {
+  useEditorStore,
+  useEditorUpdateStore,
+  useTargetNode,
+} from "@/store/zustand";
 import {
   AlignCenterIcon,
   AlignJustifyIcon,
@@ -553,6 +557,52 @@ const HeadingLevelButton = () => {
   );
 };
 
+// const AlgebraSignButton = () => {
+//   const signs = [
+//     {
+//       Label:"Sin",
+//       value:
+//     }
+//   ]
+//   return (
+//     <DropdownMenu>
+//       <DropdownMenuTrigger asChild>
+//         <button className="h-7 min-w-7 shrink-0 flex items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hidden text-sm">
+//           <span className="truncate">Algebra Sign</span>
+//           <ChevronDown className="ml-2 size-4 shrink-0" />
+//         </button>
+//       </DropdownMenuTrigger>
+//       <DropdownMenuContent className="p-1 flex flex-col gap-y-1">
+//         {signs.map(({ label, value, fontSize }) => (
+//           <button
+//             key={value}
+//             onClick={() => {
+//               if (value === 0) {
+//                 editor?.chain().focus().setParagraph().run();
+//               } else {
+//                 editor
+//                   ?.chain()
+//                   .focus()
+//                   .toggleHeading({ level: value as Level })
+//                   .run();
+//               }
+//             }}
+//             style={{ fontSize }}
+//             className={cn(
+//               "flex items-center gap-x-2 px-2 py-1 rounded-sm hover:bg-neutral-200/80",
+//               (value === 0 && !editor?.isActive("heading")) ||
+//                 (editor?.isActive("heading", { level: value }) &&
+//                   "bg-neutral-200/80")
+//             )}
+//           >
+//             {label}
+//           </button>
+//         ))}
+//       </DropdownMenuContent>
+//     </DropdownMenu>
+//   )
+// }
+
 const FontFamilyButton = () => {
   const { editor } = useEditorStore();
   const fonts = [
@@ -613,7 +663,7 @@ const ToolbarButton = ({ onClick, isActive, Icon }: ToolbarButtonProps) => {
 
 export default function Toolbar() {
   const { editor } = useEditorStore();
-  const { increaseCount } = useEditorCount();
+  const { increaseCount } = useEditorUpdateStore();
   const { setNodeId } = useTargetNode();
 
   const uuid = uuidv4();
@@ -728,10 +778,9 @@ export default function Toolbar() {
             .focus()
             .insertInput({
               id: uuid,
-              align: "left",
+              align: "right",
               height: 40,
               width: 100,
-
             })
             .run();
           setNodeId(uuid);
@@ -779,6 +828,7 @@ export default function Toolbar() {
         <Button variant="outline" onClick={handleIncreaseEditor}>
           Add Question +
         </Button>
+        <Button onClick={() => editor?.commands.splitBlock()}>Line</Button>
       </div>
     </div>
   );

@@ -96,7 +96,7 @@ export const SingleInput = Node.create<InputOptions>({
       optionRight: {
         default: false,
       },
-      optionLeftText: {
+      optionLeftHtml: {
         default: "",
         parseHTML: (element) => element.getAttribute("data-option-left"),
         renderHTML: (attributes) => {
@@ -105,7 +105,7 @@ export const SingleInput = Node.create<InputOptions>({
           };
         },
       },
-      optionRightText: {
+      optionRightHtml: {
         default: "",
         parseHTML: (element) => element.getAttribute("data-option-right"),
         renderHTML: (attributes) => {
