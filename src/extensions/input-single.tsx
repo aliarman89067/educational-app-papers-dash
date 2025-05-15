@@ -23,6 +23,8 @@ declare module "@tiptap/core" {
         color?: string;
         width: number;
         height: number;
+        optionLeftHtml?: string;
+        optionRightHtml?: string;
       }) => ReturnType;
     };
   }
@@ -98,21 +100,9 @@ export const SingleInput = Node.create<InputOptions>({
       },
       optionLeftHtml: {
         default: "",
-        parseHTML: (element) => element.getAttribute("data-option-left"),
-        renderHTML: (attributes) => {
-          return {
-            "data-option-left": attributes.optionLeftText,
-          };
-        },
       },
       optionRightHtml: {
         default: "",
-        parseHTML: (element) => element.getAttribute("data-option-right"),
-        renderHTML: (attributes) => {
-          return {
-            "data-option-right": attributes.optionRightText,
-          };
-        },
       },
       class: {
         default: "single-input",

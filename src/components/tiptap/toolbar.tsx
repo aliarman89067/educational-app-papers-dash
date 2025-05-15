@@ -781,6 +781,8 @@ export default function Toolbar() {
               align: "right",
               height: 40,
               width: 100,
+              optionLeftHtml: "",
+              optionRightHtml: "",
             })
             .run();
           setNodeId(uuid);

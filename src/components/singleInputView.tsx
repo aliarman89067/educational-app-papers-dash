@@ -122,7 +122,7 @@ export const SingleInputNodeView = ({
         defaultLineHeight: "normal",
       }),
     ],
-    content: "",
+    content: node.attrs.optionLeftHtml,
     editable: true,
     editorProps: {
       attributes: {
@@ -198,7 +198,7 @@ export const SingleInputNodeView = ({
         defaultLineHeight: "normal",
       }),
     ],
-    content: "",
+    content: node.attrs.optionRightHtml,
     editable: true,
     editorProps: {
       attributes: {
@@ -248,7 +248,7 @@ export const SingleInputNodeView = ({
             </div>
           </div>
         )}
-        {selected && node.attrs.optionLeft ? (
+        {selected && node.attrs.optionLeftHtml ? (
           // <textarea
           //   value={node.attrs.optionLeftText || ""}
           //   onChange={handleOptionLeftChange}
@@ -258,7 +258,7 @@ export const SingleInputNodeView = ({
           <EditorContent editor={innerEditor1} />
         ) : (
           <>
-            {node.attrs.optionLeft && (
+            {node.attrs.optionLeftHtml && (
               // <span className="text-sm">{}</span>
               <div
                 dangerouslySetInnerHTML={{
@@ -283,7 +283,7 @@ export const SingleInputNodeView = ({
           }}
         />
 
-        {selected && node.attrs.optionRight ? (
+        {selected && node.attrs.optionRightHtml ? (
           // <textarea
           //   value={node.attrs.optionRightText || ""}
           //   onChange={handleOptionRightChange}
@@ -293,7 +293,7 @@ export const SingleInputNodeView = ({
           <EditorContent editor={innerEditor2} />
         ) : (
           <>
-            {node.attrs.optionRight && (
+            {node.attrs.optionRightHtml && (
               // <span className="text-sm">{node.attrs.optionRightText}</span>
               <div
                 dangerouslySetInnerHTML={{

@@ -13,7 +13,7 @@ const HomePage = () => {
   const { editor } = useEditorStore();
 
   const { nodeId } = useTargetNode();
-  console.log(editorContentArr);
+  console.log(editor?.getHTML());
   return (
     <div className="flex flex-col w-full h-full mx-auto">
       <Toolbar />
